@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starter BCO Plan Progress Dashboard</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 p-8 md:p-12">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-10 text-center">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-purple-400 drop-shadow-lg">Starter BCO Plan Progress Dashboard</h1>
+            <p class="mt-2 text-lg md:text-xl text-gray-400">Executive overview of deliverables and status from Jun/25-YTD.</p>
+        </header>
+
+        <!-- Introduction Section -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 mb-10">
+            <h2 class="text-2xl font-bold text-gray-300 mb-4">Summary</h2>
+            <p class="text-gray-400">In June, I joined the Lending team with a 90-day delivery plan focused on strengthening Business Continuity Management (BCM), enhancing governance over issues and incidents, and driving continuous improvement across lending processes. This progress page provides a view of achievements, work in progress, and ongoing activities. </p>
+        </div>
+
+        <!-- Summary and Key Indicators Section -->
+        <div id="summary-section" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <!-- Summary cards will be injected here -->
+        </div>
+
+        <!-- Overall Progress Bar -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 mb-10">
+            <h3 class="text-xl font-bold text-gray-300 mb-4">Overall Progress</h3>
+            <div class="w-full bg-gray-700 rounded-full h-4">
+                <div id="progress-bar" class="h-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-700 ease-out" style="width: 0;"></div>
+            </div>
+            <p id="progress-text" class="text-right mt-2 text-lg font-semibold text-purple-400">0% Completed</p>
+        </div>
+
+        <!-- Deliverables Filter and Details Table -->
+        <div class="bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-purple-500/20">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-300 mb-4">Deliverable Details</h3>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
+                    <label for="status-filter" class="text-gray-400 mb-2 sm:mb-0">Filter by Status:</label>
+                    <select id="status-filter" class="bg-gray-700 text-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="All">All</option>
+                        <option value="Done">Done</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Not Started">Not Started</option>
+                    </select>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-700">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Process</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Scope</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Requirement</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projects-table-body" class="bg-gray-800 divide-y divide-gray-700">
+                        <!-- Table rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Strategic Impact Section -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 mt-10">
+            <h3 class="text-2xl font-bold text-gray-300 mb-4">Strategic Impact</h3>
+            <p class="text-gray-400 mb-4">So Far...</p>
+            <ul class="list-disc list-inside space-y-2 text-gray-400 pl-4">
+                <li>Completed BCM cycle and continuous monitoring of Issues and Action Plans from Projac, mandatory trainning and Incidents management </li>
+            
+                <li>Deliverables in progress are being closely monitored to ensure completion as soon as possible</li>
+                <li>For pending deliverables, I am committed to driving their execution with the highest dedication</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const projects = [
+            { process: 'BCM', scope: 'Personal Loan', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
+            { process: 'BCM', scope: 'FGTS', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
+            { process: 'BCM', scope: 'Consignment', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
+            { process: 'BCM', scope: 'Mexico', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
+            { process: 'BCM', scope: 'Colombia', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'In Progress' },
+            { process: 'BCM', scope: 'Investment Backed Loan', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
+            { process: 'BCM', scope: 'Private Payroll', required: 'Final BIA submitted and validated', comment: '-', status: 'Not Started' },
+            { process: 'BCM', scope: 'Working Capital Loan', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
+            { process: 'Issues & Actions (Projac)', scope: 'Global Lending', required: 'Action plans created for open issues', comment: 'All issues have documented action plans.', status: 'Done' },
+            { process: 'Issues & Actions (Recurring Monitoring)', scope: 'Global Lending', required: 'Biweekly follow-up on issues and actions', comment: 'Timely creation, due date monitoring, and review of self-identified issues.', status: 'Ongoing' },
+            { process: 'Incident Management', scope: 'Global Lending', required: 'Monthly incident review and reporting', comment: 'Sev 1 & 2 incidents reported in Risk Monthly.', status: 'Ongoing' },
+            { process: 'Mandatory Trainings', scope: 'Global Lending', required: 'Monthly follow-up on training completion', comment: '≥95% completion rate - follow-ups and escalations as needed.', status: 'Ongoing' },
+            { process: 'Improvements in Lending (2 processes from BIA)', scope: 'Global Lending', required: 'Create one-pager identifying improvements', comment: 'Concise and clear document summarizing improvement opportunities in Lending.', status: 'Done' },
+        ];
+
+        const statusColors = {
+            'Done': 'bg-green-500',
+            'In Progress': 'bg-blue-500',
+            'Ongoing': 'bg-yellow-500',
+            'Not Started': 'bg-gray-500',
+        };
+
+        const statusTextColors = {
+            'Done': 'text-green-500',
+            'In Progress': 'text-blue-500',
+            'Ongoing': 'text-yellow-500',
+            'Not Started': 'text-gray-500',
+        };
+        
+        const statusIcons = {
+            'Done': '✅',
+            'In Progress': '⏳',
+            'Ongoing': '🔄',
+            'Not Started': '⚪',
+        };
+
+        let currentFilter = 'All';
+
+        function renderDashboard() {
+            const filteredProjects = currentFilter === 'All' ? projects : projects.filter(p => p.status === currentFilter);
+            
+            const statusCounts = {};
+            projects.forEach(p => {
+                statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
+            });
+            
+            const totalProjects = projects.length;
+            const doneCount = statusCounts['Done'] || 0;
+            const donePercentage = (doneCount / totalProjects) * 100;
+
+            // Renders the summary section
+            const summaryHtml = `
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 hover:border-purple-500/50 transition-all duration-300">
+                    <h3 class="text-xl font-bold text-gray-300 mb-2">Total Deliverables</h3>
+                    <p class="text-4xl font-extrabold text-white">${totalProjects}</p>
+                </div>
+                ${Object.entries(statusCounts).map(([status, count]) => `
+                    <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 hover:border-purple-500/50 transition-all duration-300">
+                        <h3 class="text-xl font-bold mb-2 ${statusTextColors[status]}">${status}</h3>
+                        <p class="text-4xl font-extrabold text-white">${count}</p>
+                    </div>
+                `).join('')}
+            `;
+            document.getElementById('summary-section').innerHTML = summaryHtml;
+
+            // Renders the progress bar
+            document.getElementById('progress-bar').style.width = `${donePercentage}%`;
+            document.getElementById('progress-text').textContent = `${donePercentage.toFixed(0)}% Completed`;
+
+            // Renders the projects table
+            const tableHtml = filteredProjects.map(p => `
+                <tr class="hover:bg-gray-700 transition-colors duration-200">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${p.process}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${p.scope}</td>
+                    <td class="px-6 py-4 text-sm text-gray-400 max-w-xs truncate">${p.required}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${statusColors[p.status]}">
+                           ${statusIcons[p.status]} ${p.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('projects-table-body').innerHTML = tableHtml;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('status-filter').addEventListener('change', (e) => {
+                currentFilter = e.target.value;
+                renderDashboard();
+            });
+            renderDashboard();
+        });
+    </script>
+</body>
+</html>
