@@ -3,183 +3,560 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Starter BCO Plan Progress Dashboard</title>
-    <!-- Tailwind CSS via CDN -->
+    <title>Activity Tracking Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
+        .tab-button.active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* Custom scrollbar for tables */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200 p-8 md:p-12">
-    <div class="max-w-7xl mx-auto">
-        <header class="mb-10 text-center">
-            <h1 class="text-3xl md:text-5xl font-extrabold text-purple-400 drop-shadow-lg">Starter BCO Plan Progress Dashboard</h1>
-            <p class="mt-2 text-lg md:text-xl text-gray-400">Executive overview of deliverables and status from Jun/25-YTD.</p>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-slate-900">Progress Dashboard</h1>
+            <p class="text-slate-600 mt-2">Overview of the progress of activities by area.</p>
         </header>
 
-        <!-- Introduction Section -->
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 mb-10">
-            <h2 class="text-2xl font-bold text-gray-300 mb-4">Summary</h2>
-            <p class="text-gray-400">In June, I joined the Lending team with a 90-day delivery plan focused on strengthening Business Continuity Management (BCM), enhancing governance over issues and incidents, and driving continuous improvement across lending processes. This progress page provides a view of achievements, work in progress, and ongoing activities. </p>
+        <!-- Tab Navigation -->
+        <div class="mb-6 border-b border-slate-200">
+            <nav class="flex flex-wrap -mb-px" id="tab-buttons">
+                <button class="tab-button active text-lg py-4 px-6 border-b-2 border-transparent font-semibold hover:text-blue-500 hover:border-blue-500 transition-colors duration-200" data-tab="rcsa">RCSA</button>
+                <button class="tab-button text-lg py-4 px-6 border-b-2 border-transparent font-semibold hover:text-blue-500 hover:border-blue-500 transition-colors duration-200" data-tab="bcm">BCM</button>
+                <button class="tab-button text-lg py-4 px-6 border-b-2 border-transparent font-semibold hover:text-blue-500 hover:border-blue-500 transition-colors duration-200" data-tab="training">Mandatory Training</button>
+                <button class="tab-button text-lg py-4 px-6 border-b-2 border-transparent font-semibold hover:text-blue-500 hover:border-blue-500 transition-colors duration-200" data-tab="incidents">Incidents Sev 1&2</button>
+                <button class="tab-button text-lg py-4 px-6 border-b-2 border-transparent font-semibold hover:text-blue-500 hover:border-blue-500 transition-colors duration-200" data-tab="issues">Issues & AP</button>
+            </nav>
         </div>
 
-        <!-- Summary and Key Indicators Section -->
-        <div id="summary-section" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <!-- Summary cards will be injected here -->
-        </div>
-
-        <!-- Overall Progress Bar -->
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 mb-10">
-            <h3 class="text-xl font-bold text-gray-300 mb-4">Overall Progress</h3>
-            <div class="w-full bg-gray-700 rounded-full h-4">
-                <div id="progress-bar" class="h-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-700 ease-out" style="width: 0;"></div>
-            </div>
-            <p id="progress-text" class="text-right mt-2 text-lg font-semibold text-purple-400">0% Completed</p>
-        </div>
-
-        <!-- Deliverables Filter and Details Table -->
-        <div class="bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-purple-500/20">
-            <div class="p-6">
-                <h3 class="text-xl font-bold text-gray-300 mb-4">Deliverable Details</h3>
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
-                    <label for="status-filter" class="text-gray-400 mb-2 sm:mb-0">Filter by Status:</label>
-                    <select id="status-filter" class="bg-gray-700 text-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        <option value="All">All</option>
-                        <option value="Done">Done</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Ongoing">Ongoing</option>
-                        <option value="Not Started">Not Started</option>
-                    </select>
+        <!-- Tab Content -->
+        <main id="tab-contents">
+            <!-- RCSA Tab -->
+            <div id="rcsa" class="tab-content active animate-fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Filters -->
+                    <div class="md:col-span-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <h3 class="text-lg font-semibold text-slate-700">Filters:</h3>
+                            <div>
+                                <label for="rcsa-geo-filter" class="block text-sm font-medium text-slate-600 mb-1">Country (GEO)</label>
+                                <select id="rcsa-geo-filter" class="w-48 rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></select>
+                            </div>
+                            <div>
+                                <label for="rcsa-status-filter" class="block text-sm font-medium text-slate-600 mb-1">Status</label>
+                                <select id="rcsa-status-filter" class="w-48 rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Chart -->
+                    <div class="md:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center items-center">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-4 text-center">Task Status</h3>
+                        <div class="w-full h-64"><canvas id="rcsa-chart"></canvas></div>
+                    </div>
+                    <!-- Data Table -->
+                    <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                             <h3 class="text-xl font-semibold text-slate-800">Activity Details</h3>
+                             <span id="rcsa-count" class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full"></span>
+                        </div>
+                        <div class="table-container overflow-x-auto max-h-96">
+                            <table class="w-full text-sm text-left text-slate-600">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-6 py-3">Task</th>
+                                        <th class="px-6 py-3">Sub-Task</th>
+                                        <th class="px-6 py-3">Status</th>
+                                        <th class="px-6 py-3">Deadline</th>
+                                        <th class="px-6 py-3">Country</th>
+                                        <th class="px-6 py-3">Product</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rcsa-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-700">
-                    <thead class="bg-gray-700">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Process</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Scope</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Requirement</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="projects-table-body" class="bg-gray-800 divide-y divide-gray-700">
-                        <!-- Table rows will be injected here -->
-                    </tbody>
-                </table>
+
+            <!-- BCM Tab -->
+            <div id="bcm" class="tab-content animate-fade-in">
+                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Filters -->
+                    <div class="md:col-span-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <h3 class="text-lg font-semibold text-slate-700">Filters:</h3>
+                            <div>
+                                <label for="bcm-geo-filter" class="block text-sm font-medium text-slate-600 mb-1">Country (GEO)</label>
+                                <select id="bcm-geo-filter" class="w-48 rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></select>
+                            </div>
+                            <div>
+                                <label for="bcm-status-filter" class="block text-sm font-medium text-slate-600 mb-1">Status</label>
+                                <select id="bcm-status-filter" class="w-48 rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Chart -->
+                    <div class="md:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center items-center">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-4 text-center">Task Status</h3>
+                        <div class="w-full h-64"><canvas id="bcm-chart"></canvas></div>
+                    </div>
+                    <!-- Data Table -->
+                    <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                         <div class="flex justify-between items-center mb-4">
+                             <h3 class="text-xl font-semibold text-slate-800">Activity Details</h3>
+                             <span id="bcm-count" class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full"></span>
+                        </div>
+                        <div class="table-container overflow-x-auto max-h-96">
+                            <table class="w-full text-sm text-left text-slate-600">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-6 py-3">Country</th>
+                                        <th class="px-6 py-3">Task</th>
+                                        <th class="px-6 py-3">Sub-Task</th>
+                                        <th class="px-6 py-3">Status</th>
+                                        <th class="px-6 py-3">Product</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bcm-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <!-- Strategic Impact Section -->
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 mt-10">
-            <h3 class="text-2xl font-bold text-gray-300 mb-4">Strategic Impact</h3>
-            <p class="text-gray-400 mb-4">So Far...</p>
-            <ul class="list-disc list-inside space-y-2 text-gray-400 pl-4">
-                <li>Completed BCM cycle and continuous monitoring of Issues and Action Plans from Projac, mandatory trainning and Incidents management </li>
             
-                <li>Deliverables in progress are being closely monitored to ensure completion as soon as possible</li>
-                <li>For pending deliverables, I am committed to driving their execution with the highest dedication</li>
-            </ul>
-        </div>
+            <!-- Mandatory Training Tab -->
+            <div id="training" class="tab-content animate-fade-in">
+                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Filters -->
+                    <div class="md:col-span-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <h3 class="text-lg font-semibold text-slate-700">Filters:</h3>
+                            <div>
+                                <label for="training-country-filter" class="block text-sm font-medium text-slate-600 mb-1">Country</label>
+                                <select id="training-country-filter" class="w-48 rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></select>
+                            </div>
+                            <div>
+                                <label for="training-status-filter" class="block text-sm font-medium text-slate-600 mb-1">Status</label>
+                                <select id="training-status-filter" class="w-48 rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Chart -->
+                    <div class="md:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center items-center">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-4 text-center">Training Status</h3>
+                        <div class="w-full h-64"><canvas id="training-chart"></canvas></div>
+                    </div>
+                    <!-- Data Table -->
+                    <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                         <div class="flex justify-between items-center mb-4">
+                             <h3 class="text-xl font-semibold text-slate-800">Training Details</h3>
+                             <span id="training-count" class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full"></span>
+                        </div>
+                        <div class="table-container overflow-x-auto max-h-96">
+                            <table class="w-full text-sm text-left text-slate-600">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-6 py-3">Email</th>
+                                        <th class="px-6 py-3">Country</th>
+                                        <th class="px-6 py-3">Department</th>
+                                        <th class="px-6 py-3">Course</th>
+                                        <th class="px-6 py-3">Status</th>
+                                        <th class="px-6 py-3">Deadline</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="training-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incidents Sev 1&2 Management Tab -->
+            <div id="incidents" class="tab-content animate-fade-in">
+                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                     <div class="flex justify-between items-center mb-4">
+                         <h3 class="text-xl font-semibold text-slate-800">Incident Management (Sev 1 & 2)</h3>
+                         <span id="incidents-count" class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full"></span>
+                    </div>
+                    <p class="text-slate-600 mb-4">This section shows the log of reported incidents. No country filters are available for this data.</p>
+                    <div class="table-container overflow-x-auto max-h-[32rem]">
+                        <table class="w-full text-sm text-left text-slate-600">
+                            <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
+                                <tr>
+                                    <th class="px-6 py-3">Area</th>
+                                    <th class="px-6 py-3">Month</th>
+                                    <th class="px-6 py-3">Incident Reported?</th>
+                                    <th class="px-6 py-3">IRC Description</th>
+                                    <th class="px-6 py-3">Documentation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incidents-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issues & AP Tab -->
+            <div id="issues" class="tab-content animate-fade-in">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3 class="mt-4 text-xl font-semibold text-slate-800">Issues & Action Plans</h3>
+                    <p class="mt-2 text-slate-500">Data for this section was not found in the provided file. The dashboard will be updated as soon as the data is available.</p>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <script>
-        const projects = [
-            { process: 'BCM', scope: 'Personal Loan', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
-            { process: 'BCM', scope: 'FGTS', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
-            { process: 'BCM', scope: 'Consignment', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
-            { process: 'BCM', scope: 'Mexico', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
-            { process: 'BCM', scope: 'Colombia', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'In Progress' },
-            { process: 'BCM', scope: 'Investment Backed Loan', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
-            { process: 'BCM', scope: 'Private Payroll', required: 'Final BIA submitted and validated', comment: '-', status: 'Not Started' },
-            { process: 'BCM', scope: 'Working Capital Loan', required: 'Final BIA submitted and validated', comment: 'No OCP Required', status: 'Done' },
-            { process: 'Issues & Actions (Projac)', scope: 'Global Lending', required: 'Action plans created for open issues', comment: 'All issues have documented action plans.', status: 'Done' },
-            { process: 'Issues & Actions (Recurring Monitoring)', scope: 'Global Lending', required: 'Biweekly follow-up on issues and actions', comment: 'Timely creation, due date monitoring, and review of self-identified issues.', status: 'Ongoing' },
-            { process: 'Incident Management', scope: 'Global Lending', required: 'Monthly incident review and reporting', comment: 'Sev 1 & 2 incidents reported in Risk Monthly.', status: 'Ongoing' },
-            { process: 'Mandatory Trainings', scope: 'Global Lending', required: 'Monthly follow-up on training completion', comment: '≥95% completion rate - follow-ups and escalations as needed.', status: 'Ongoing' },
-            { process: 'Improvements in Lending (2 processes from BIA)', scope: 'Global Lending', required: 'Create one-pager identifying improvements', comment: 'Concise and clear document summarizing improvement opportunities in Lending.', status: 'Done' },
-        ];
+<script>
+// --- EMBEDDED CSV DATA ---
 
-        const statusColors = {
-            'Done': 'bg-green-500',
-            'In Progress': 'bg-blue-500',
-            'Ongoing': 'bg-yellow-500',
-            'Not Started': 'bg-gray-500',
-        };
+const rcsaData = [
+    { Task: "Process Catalog Review", "Sub-Task": "Create process and sub-processes", Enabler: "BCO", Status: "Completed", Deadline: "08/06/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Process Catalog Review", "Sub-Task": "Review with teams process catalog", Enabler: "BCO", Status: "Completed", Deadline: "08/06/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Process Catalog Review", "Sub-Task": "Submit Process Catalog updates for Projac team", Enabler: "BCO", Status: "Completed", Deadline: "08/06/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Kick-off meeting", "Sub-Task": "Kick-off meeting held by 2nd line", Enabler: "2nd Line", Status: "Completed", Deadline: "08/06/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Create channel", "Sub-Task": "Create channel", Enabler: "BCO", Status: "Completed", Deadline: "08/06/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Risk Identification", "Sub-Task": "Raise risks according to processes mapped", Enabler: "Pops, BCO", Status: "Completed", Deadline: "08/06/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Office-Hours", "Sub-Task": "Office-Hours week #1", Enabler: "BCO", Status: "Completed", Deadline: "08/06/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Risk Identification", "Sub-Task": "Assign Risk Taxonomy according according Risk Dictionary", Enabler: "Pops, BCO", Status: "Completed", Deadline: "09/05/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Risk Identification", "Sub-Task": "Describe risk Cause according according Risk Dictionary", Enabler: "Pops, BCO", Status: "Completed", Deadline: "09/05/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Office-Hours", "Sub-Task": "Office-Hours week #2", Enabler: "BCO", Status: "Completed", Deadline: "09/05/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Review and Challenge 2nd line", "Sub-Task": "Review & Challenge in RCSA file", Enabler: "Pops, BCO", Status: "In Progress", Deadline: "09/12/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Review and Challenge 2nd line", "Sub-Task": "Address comments from R&C", Enabler: "Pops, BCO", Status: "In Progress", Deadline: "09/12/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Kick-off meeting Product teams", "Sub-Task": "BCO held meeting with BA, Pops and Engineering", Enabler: "BCO", Status: "Completed", Deadline: "09/05/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Control Identification", "Sub-Task": "Identify controls that mitigates risk and risk cause", Enabler: "Engineering, BA, Pops", Status: "In Progress", Deadline: "09/26/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Control Identification", "Sub-Task": "Complete RCSA file with identified controls", Enabler: "Engineering, BA, Pops", Status: "In Progress", Deadline: "09/26/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Control Identification", "Sub-Task": "Identify Controlinhos", Enabler: "Engineering, BA, Pops", Status: "In Progress", Deadline: "09/26/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Review and Challenge 2nd line", "Sub-Task": "Review & Challenge in RCSA file", Enabler: null, Status: "Not Started", Deadline: "10/03/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Review and Challenge 2nd line", "Sub-Task": "Address comments from R&C", Enabler: null, Status: "Not Started", Deadline: "10/03/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Control Assessment", "Sub-Task": "Evaluate control design", Enabler: null, Status: "Not Started", Deadline: "10/10/2025", GEO: "BRA", Product: "FGTS, Public Payroll" },
+    { Task: "Control Assessment", "Sub-Task": "Evaluate control effectiveness", Enabler: null, Status: "Not Started", Deadline: "10/10/2025", GEO: "BRA", Product: "FGTS, Public Payroll" }
+];
 
-        const statusTextColors = {
-            'Done': 'text-green-500',
-            'In Progress': 'text-blue-500',
-            'Ongoing': 'text-yellow-500',
-            'Not Started': 'text-gray-500',
-        };
-        
-        const statusIcons = {
-            'Done': '✅',
-            'In Progress': '⏳',
-            'Ongoing': '🔄',
-            'Not Started': '⚪',
-        };
+const bcmData = [
+    { GEO: "BRA", Task: "Scope Definition", "Sub-Task": "Scope Definition", Enabler: "2nd Line", Product: "Personal Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Scope Definition", "Sub-Task": "Create Process in Jira", Enabler: "Pops", Product: "Personal Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "Business Impact Analysis | BIA", Enabler: "Pops, Engineering", Product: "Personal Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "Complete Impact Analysis", Enabler: "Pops, Engineering", Product: "Personal Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "GM/Head Approval", Enabler: "BCO", Product: "Personal Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Continuity Strategies", "Sub-Task": "Continuity Strategies", Enabler: "Engineering, BAs, Pops, BCO", Product: "Personal Loan", Status: "Not Applicable" },
+    { GEO: "BRA", Task: "Continuity Strategies", "Sub-Task": "Define OCP", Enabler: "Engineering, BAs, Pops, BCO", Product: "Personal Loan", Status: "Not Applicable" },
+    { GEO: "BRA", Task: "Continuity Tests", "Sub-Task": "Continuity Tests", Enabler: "Engineering, BAs, Pops, BCO", Product: "Personal Loan", Status: "Not Applicable" },
+    { GEO: "BRA", Task: "Business Continuity Plan | BCP", "Sub-Task": "Business Continuity Plan | BCP", Enabler: "Engineering, BAs, Pops, BCO", Product: "Personal Loan", Status: "Not Applicable" },
+    { GEO: "BRA", Task: "Scope Definition", "Sub-Task": "Scope Definition", Enabler: "2nd Line", Product: "Working Capital Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Scope Definition", "Sub-Task": "Create Process in Jira", Enabler: "Pops", Product: "Working Capital Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "Business Impact Analysis | BIA", Enabler: "Pops, Engineering", Product: "Working Capital Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "Complete Impact Analysis", Enabler: "Pops, Engineering", Product: "Working Capital Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "GM/Head Approval", Enabler: "BCO", Product: "Working Capital Loan", Status: "Completed" },
+    { GEO: "BRA", Task: "Continuity Strategies", "Sub-Task": "Continuity Strategies", Enabler: "Engineering, BAs, Pops, BCO", Product: "Working Capital Loan", Status: "Not Applicable" },
+    { GEO: "BRA", Task: "Scope Definition", "Sub-Task": "Scope Definition", Enabler: "2nd Line", Product: "IBL", Status: "Completed" },
+    { GEO: "BRA", Task: "Scope Definition", "Sub-Task": "Create Process in Jira", Enabler: "Pops", Product: "IBL", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "Business Impact Analysis | BIA", Enabler: "Pops, Engineering", Product: "IBL", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "Complete Impact Analysis", Enabler: "Pops, Engineering", Product: "IBL", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "GM/Head Approval", Enabler: "BCO", Product: "IBL", Status: "Completed" },
+    { GEO: "BRA", Task: "Continuity Strategies", "Sub-Task": "Continuity Strategies", Enabler: "Engineering, BAs, Pops, BCO", Product: "IBL", Status: "Not Applicable" },
+    { GEO: "BRA", Task: "Scope Definition", "Sub-Task": "Scope Definition", Enabler: "2nd Line", Product: "FGTS", Status: "Completed" },
+    { GEO: "BRA", Task: "Scope Definition", "Sub-Task": "Create Process in Jira", Enabler: "Pops", Product: "FGTS", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "Business Impact Analysis | BIA", Enabler: "Pops, Engineering", Product: "FGTS", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "Complete Impact Analysis", Enabler: "Pops, Engineering", Product: "FGTS", Status: "Completed" },
+    { GEO: "BRA", Task: "Business Impact Analysis | BIA", "Sub-Task": "GM/Head Approval", Enabler: "BCO", Product: "FGTS", Status: "Completed" },
+    { GEO: "BRA", Task: "Continuity Strategies", "Sub-Task": "Continuity Strategies", Enabler: "Engineering, BAs, Pops, BCO", Product: "FGTS", Status: "Not Applicable" },
+];
 
-        let currentFilter = 'All';
+const trainingData = [
+    { "Work Email": "anita.martins@nubank.com.br", "Work Country": "BR", "Department Name": "New loans", Status: "1- Compliant", "Course Name": "Mandatory Training | Code of Conduct", "Due Date": null, "completed_date": "Feb 5, 2025" },
+    { "Work Email": "wislley.costa@nubank.com.br", "Work Country": "BR", "Department Name": "Mass Market Policies", Status: "1- Compliant", "Course Name": "Mandatory Training | Operational Risk", "Due Date": null, "completed_date": "Nov 29, 2024" },
+    { "Work Email": "diane.bernucio@nubank.com.br", "Work Country": "BR", "Department Name": "Post-Hiring", Status: "1- Compliant", "Course Name": "Mandatory Training | Code of Conduct", "Due Date": null, "completed_date": "Dec 23, 2024" },
+    { "Work Email": "thiago.leite@nubank.com.br", "Work Country": "BR", "Department Name": "Credit Servicing", Status: "1- Compliant", "Course Name": "Mandatory Training | Code of Conduct", "Due Date": null, "completed_date": "May 22, 2025" },
+    { "Work Email": "emanuela.amorim@nubank.com.br", "Work Country": "BR", "Department Name": "Secured Loans", Status: "5- Enrolled", "Course Name": "Mandatory Training | Data Access Approver", "Due Date": "Sep 18, 2025", "completed_date": null },
+    { "Work Email": "leonardo.salvador@nubank.com.br", "Work Country": "BR", "Department Name": "Smart Guarantees", Status: "1- Compliant", "Course Name": "Mandatory Training | AML Review 2024", "Due Date": "Jul 4, 2024", "completed_date": null },
+    { "Work Email": "renan.trevisan@nubank.com.br", "Work Country": "BR", "Department Name": "Lending Customer Management", Status: "1- Compliant", "Course Name": "Mandatory Training | AML General", "Due Date": "Aug 9, 2024", "completed_date": null },
+    { "Work Email": "daniela.brioschi@nubank.com.br", "Work Country": "BR", "Department Name": "Lending Growth", Status: "5- Enrolled", "Course Name": "Mandatory Training | Data Access Approver", "Due Date": "Sep 18, 2025", "completed_date": null }
+];
 
-        function renderDashboard() {
-            const filteredProjects = currentFilter === 'All' ? projects : projects.filter(p => p.status === currentFilter);
-            
-            const statusCounts = {};
-            projects.forEach(p => {
-                statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
-            });
-            
-            const totalProjects = projects.length;
-            const doneCount = statusCounts['Done'] || 0;
-            const donePercentage = (doneCount / totalProjects) * 100;
+const incidentsData = [
+    { Area: "Data", Month: "January", "Incident Reported?": "Yes", IRC: "IRC-14241 nu-br/dataset/personal-loan-id-to-vigia-v2-attributes failed for target date 2025-01-13.", Documentation: "https://nubank.atlassian.net/browse/IRC-14241" },
+    { Area: "Engineering", Month: "January", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Data", Month: "February", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Engineering", Month: "February", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Data", Month: "March", "Incident Reported?": "Yes", IRC: "IRC-15582 Change in dataset/credit-card-loans-ledger breaking Lending policies", Documentation: "https://nubank.atlassian.net/browse/IRC-15582" },
+    { Area: "Engineering", Month: "March", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Data", Month: "April", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Engineering", Month: "April", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Data", Month: "May", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Engineering", Month: "May", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Data", Month: "June", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Engineering", Month: "June", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Data", Month: "July", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Engineering", Month: "July", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Data", Month: "August", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Engineering", Month: "August", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Data", Month: "September", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+    { Area: "Engineering", Month: "September", "Incident Reported?": "No", IRC: "-", Documentation: "-" },
+];
 
-            // Renders the summary section
-            const summaryHtml = `
-                <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 hover:border-purple-500/50 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-gray-300 mb-2">Total Deliverables</h3>
-                    <p class="text-4xl font-extrabold text-white">${totalProjects}</p>
-                </div>
-                ${Object.entries(statusCounts).map(([status, count]) => `
-                    <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-purple-500/20 hover:border-purple-500/50 transition-all duration-300">
-                        <h3 class="text-xl font-bold mb-2 ${statusTextColors[status]}">${status}</h3>
-                        <p class="text-4xl font-extrabold text-white">${count}</p>
-                    </div>
-                `).join('')}
-            `;
-            document.getElementById('summary-section').innerHTML = summaryHtml;
+// --- DASHBOARD LOGIC ---
 
-            // Renders the progress bar
-            document.getElementById('progress-bar').style.width = `${donePercentage}%`;
-            document.getElementById('progress-text').textContent = `${donePercentage.toFixed(0)}% Completed`;
+document.addEventListener('DOMContentLoaded', () => {
+    // Global variables for charts to destroy them before re-rendering
+    let rcsaChartInstance, bcmChartInstance, trainingChartInstance;
 
-            // Renders the projects table
-            const tableHtml = filteredProjects.map(p => `
-                <tr class="hover:bg-gray-700 transition-colors duration-200">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">${p.process}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${p.scope}</td>
-                    <td class="px-6 py-4 text-sm text-gray-400 max-w-xs truncate">${p.required}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${statusColors[p.status]}">
-                           ${statusIcons[p.status]} ${p.status}
-                        </span>
-                    </td>
-                </tr>
-            `).join('');
-            document.getElementById('projects-table-body').innerHTML = tableHtml;
+    const statusColors = {
+        'Completed': '#22c55e', // green
+        '1- Compliant': '#22c55e',
+        'In Progress': '#3b82f6', // blue
+        'Not Started': '#f97316', // orange
+        '5- Enrolled': '#facc15', // yellow
+        'Enrolled': '#facc15',
+        'Not Applicable': '#94a3b8', // slate
+    };
+
+    // --- Tab Navigation Logic ---
+    const tabButtons = document.getElementById('tab-buttons');
+    const tabContents = document.getElementById('tab-contents');
+
+    tabButtons.addEventListener('click', (e) => {
+        if (e.target.classList.contains('tab-button')) {
+            const tabId = e.target.getAttribute('data-tab');
+
+            // Update button styles
+            tabButtons.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+
+            // Update content visibility
+            tabContents.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
         }
+    });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('status-filter').addEventListener('change', (e) => {
-                currentFilter = e.target.value;
-                renderDashboard();
-            });
-            renderDashboard();
+    // --- Helper Functions ---
+    const populateFilter = (selectElement, data, key) => {
+        const uniqueValues = ['All', ...new Set(data.map(item => item[key]).filter(Boolean))];
+        selectElement.innerHTML = uniqueValues.map(value => `<option value="${value}">${value}</option>`).join('');
+    };
+
+    const createChart = (ctx, data, labelKey) => {
+        const statusCounts = data.reduce((acc, item) => {
+            const status = item[labelKey] || 'N/A';
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+        }, {});
+
+        const labels = Object.keys(statusCounts);
+        const chartData = Object.values(statusCounts);
+        const backgroundColors = labels.map(label => statusColors[label] || '#cbd5e1');
+        
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Status',
+                    data: chartData,
+                    backgroundColor: backgroundColors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
         });
-    </script>
+    };
+
+    // --- RCSA Tab Logic ---
+    const rcsaGeoFilter = document.getElementById('rcsa-geo-filter');
+    const rcsaStatusFilter = document.getElementById('rcsa-status-filter');
+    const rcsaTable = document.getElementById('rcsa-table');
+    const rcsaChartCtx = document.getElementById('rcsa-chart').getContext('2d');
+    const rcsaCount = document.getElementById('rcsa-count');
+
+    const renderRcsa = () => {
+        const geo = rcsaGeoFilter.value;
+        const status = rcsaStatusFilter.value;
+
+        const filteredData = rcsaData.filter(item => 
+            (geo === 'All' || item.GEO === geo) &&
+            (status === 'All' || item.Status === status)
+        );
+        
+        rcsaCount.textContent = `${filteredData.length} results`;
+
+        rcsaTable.innerHTML = filteredData.map(item => `
+            <tr class="bg-white border-b hover:bg-slate-50">
+                <td class="px-6 py-4 font-medium text-slate-900">${item.Task || ''}</td>
+                <td class="px-6 py-4">${item['Sub-Task'] || ''}</td>
+                <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full" style="background-color: ${statusColors[item.Status] || '#cbd5e1'}30; color: ${statusColors[item.Status] || '#cbd5e1'}">${item.Status || ''}</span></td>
+                <td class="px-6 py-4">${item.Deadline || ''}</td>
+                <td class="px-6 py-4">${item.GEO || ''}</td>
+                <td class="px-6 py-4">${item.Product || ''}</td>
+            </tr>
+        `).join('');
+
+        if (rcsaChartInstance) {
+            rcsaChartInstance.destroy();
+        }
+        rcsaChartInstance = createChart(rcsaChartCtx, filteredData, 'Status');
+    };
+
+    // --- BCM Tab Logic ---
+    const bcmGeoFilter = document.getElementById('bcm-geo-filter');
+    const bcmStatusFilter = document.getElementById('bcm-status-filter');
+    const bcmTable = document.getElementById('bcm-table');
+    const bcmChartCtx = document.getElementById('bcm-chart').getContext('2d');
+    const bcmCount = document.getElementById('bcm-count');
+
+    const renderBcm = () => {
+        const geo = bcmGeoFilter.value;
+        const status = bcmStatusFilter.value;
+
+        const filteredData = bcmData.filter(item => 
+            (geo === 'All' || item.GEO === geo) &&
+            (status === 'All' || item.Status === status)
+        );
+        
+        bcmCount.textContent = `${filteredData.length} results`;
+
+        bcmTable.innerHTML = filteredData.map(item => `
+            <tr class="bg-white border-b hover:bg-slate-50">
+                <td class="px-6 py-4">${item.GEO || ''}</td>
+                <td class="px-6 py-4 font-medium text-slate-900">${item.Task || ''}</td>
+                <td class="px-6 py-4">${item['Sub-Task'] || ''}</td>
+                <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full" style="background-color: ${statusColors[item.Status] || '#cbd5e1'}30; color: ${statusColors[item.Status] || '#cbd5e1'}">${item.Status || ''}</span></td>
+                <td class="px-6 py-4">${item.Product || ''}</td>
+            </tr>
+        `).join('');
+
+        if (bcmChartInstance) {
+            bcmChartInstance.destroy();
+        }
+        bcmChartInstance = createChart(bcmChartCtx, filteredData, 'Status');
+    };
+
+    // --- Mandatory Training Tab Logic ---
+    const trainingCountryFilter = document.getElementById('training-country-filter');
+    const trainingStatusFilter = document.getElementById('training-status-filter');
+    const trainingTable = document.getElementById('training-table');
+    const trainingChartCtx = document.getElementById('training-chart').getContext('2d');
+    const trainingCount = document.getElementById('training-count');
+
+    const renderTraining = () => {
+        const country = trainingCountryFilter.value;
+        const status = trainingStatusFilter.value;
+
+        const filteredData = trainingData.filter(item => 
+            (country === 'All' || item['Work Country'] === country) &&
+            (status === 'All' || item.Status === status)
+        );
+        
+        trainingCount.textContent = `${filteredData.length} results`;
+
+        trainingTable.innerHTML = filteredData.map(item => `
+            <tr class="bg-white border-b hover:bg-slate-50">
+                <td class="px-6 py-4 font-medium text-slate-900">${item['Work Email'] || ''}</td>
+                <td class="px-6 py-4">${item['Work Country'] || ''}</td>
+                <td class="px-6 py-4">${item['Department Name'] || ''}</td>
+                <td class="px-6 py-4">${item['Course Name'] || ''}</td>
+                <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full" style="background-color: ${statusColors[item.Status] || '#cbd5e1'}30; color: ${statusColors[item.Status] || '#cbd5e1'}">${item.Status || ''}</span></td>
+                <td class="px-6 py-4">${item['Due Date'] || 'N/A'}</td>
+            </tr>
+        `).join('');
+
+        if (trainingChartInstance) {
+            trainingChartInstance.destroy();
+        }
+        trainingChartInstance = createChart(trainingChartCtx, filteredData, 'Status');
+    };
+
+    // --- Incidents Tab Logic ---
+    const incidentsTable = document.getElementById('incidents-table');
+    const incidentsCount = document.getElementById('incidents-count');
+    
+    const renderIncidents = () => {
+        incidentsCount.textContent = `${incidentsData.length} records`;
+        incidentsTable.innerHTML = incidentsData.map(item => `
+            <tr class="bg-white border-b hover:bg-slate-50">
+                <td class="px-6 py-4 font-medium text-slate-900">${item.Area || ''}</td>
+                <td class="px-6 py-4">${item.Month || ''}</td>
+                <td class="px-6 py-4">${item['Incident Reported?'] || ''}</td>
+                <td class="px-6 py-4">${item.IRC || ''}</td>
+                <td class="px-6 py-4">${item.Documentation.startsWith('http') ? `<a href="${item.Documentation}" target="_blank" class="text-blue-600 hover:underline">Link</a>` : '-'}</td>
+            </tr>
+        `).join('');
+    };
+
+    // --- Initial Setup ---
+    // RCSA
+    populateFilter(rcsaGeoFilter, rcsaData, 'GEO');
+    populateFilter(rcsaStatusFilter, rcsaData, 'Status');
+    rcsaGeoFilter.addEventListener('change', renderRcsa);
+    rcsaStatusFilter.addEventListener('change', renderRcsa);
+    renderRcsa();
+    
+    // BCM
+    populateFilter(bcmGeoFilter, bcmData, 'GEO');
+    populateFilter(bcmStatusFilter, bcmData, 'Status');
+    bcmGeoFilter.addEventListener('change', renderBcm);
+    bcmStatusFilter.addEventListener('change', renderBcm);
+    renderBcm();
+
+    // Training
+    populateFilter(trainingCountryFilter, trainingData, 'Work Country');
+    populateFilter(trainingStatusFilter, trainingData, 'Status');
+    trainingCountryFilter.addEventListener('change', renderTraining);
+    trainingStatusFilter.addEventListener('change', renderTraining);
+    renderTraining();
+
+    // Incidents
+    renderIncidents();
+});
+</script>
 </body>
 </html>
+
